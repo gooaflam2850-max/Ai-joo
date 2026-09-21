@@ -27,7 +27,7 @@
   </div>
 
   <script>
-    const API_KEY = "AIzaSyB8N6LYQ1ekDfEGwG3dLmWwfJ3DeS1o72cV_-E-iky_anR-A";
+    const API_KEY = "AQ.Ab8RN6Lj8Cxy4IhkZ6RwG_4TXOCA0IZ0uLM38zxpmNZMDKKrnQ";
     const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
     async function sendMessage() {
@@ -58,7 +58,6 @@
         if (response.ok && data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
           loadingDiv.innerText = data.candidates[0].content.parts[0].text;
         } else {
-          // عرض تفاصيل الخطأ القادم من السيرفر مباشرة لمعرفة السبب
           const errDetail = data.error ? (data.error.message || data.error.status) : JSON.stringify(data);
           loadingDiv.innerText = "خطأ من جوجل: " + errDetail;
         }
