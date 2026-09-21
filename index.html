@@ -28,7 +28,7 @@
 
   <script>
     const API_KEY = "AIzaSyB8N6LYQ1ekDfEGwG3dLmWwfJ3DeS1o72cV_-E-iky_anR-A";
-    const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+    const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
     async function sendMessage() {
       const inputField = document.getElementById("user-input");
@@ -54,16 +54,13 @@
         });
 
         const data = await response.json();
-        
-        if (response.ok && data.candidates && data.candidates[0].content.parts[0].text) {
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
           loadingDiv.innerText = data.candidates[0].content.parts[0].text;
-        } else if (data.error && data.error.message) {
-          loadingDiv.innerText = "خطأ من السيرفر: " + data.error.message;
         } else {
           loadingDiv.innerText = "تعذر الحصول على رد من النموذج.";
         }
       } catch (error) {
-        loadingDiv.innerText = "حدث خطأ أثناء الاتصال، يرجى التأكد من اتصال الإنترنت.";
+        loadingDiv.innerText = "حدث خطأ أثناء جلب الإجابة، يرجى التأكد من اتصال الإنترنت.";
       } finally {
         sendBtn.disabled = false;
         chatBox.scrollTop = chatBox.scrollHeight;
