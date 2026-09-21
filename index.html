@@ -8,7 +8,7 @@
     * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
     body { background-color: #f4f6f8; margin: 0; padding: 15px; display: flex; flex-direction: column; height: 100vh; }
     #chat-box { flex: 1; overflow-y: auto; background: #ffffff; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 12px; }
-    .message { margin-bottom: 12px; padding: 10px 14px; border-radius: 10px; max-width: 80%; line-height: 1.5; word-break: break-word; }
+    .message { margin-bottom: 12px; padding: 10px 14px; border-radius: 10px; max-width: 85%; line-height: 1.5; word-break: break-word; }
     .user { background: #007bff; color: white; align-self: flex-end; margin-right: auto; }
     .bot { background: #e9ecef; color: #212529; align-self: flex-start; margin-left: auto; }
     .input-area { display: flex; gap: 8px; }
@@ -28,7 +28,7 @@
 
   <script>
     const API_KEY = "AIzaSyB8N6LYQ1ekDfEGwG3dLmWwfJ3DeS1o72cV_-E-iky_anR-A";
-    const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+    const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
     async function sendMessage() {
       const inputField = document.getElementById("user-input");
@@ -54,13 +54,16 @@
         });
 
         const data = await response.json();
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
+
+        if (response.ok && data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
           loadingDiv.innerText = data.candidates[0].content.parts[0].text;
         } else {
-          loadingDiv.innerText = "تعذر الحصول على رد من النموذج.";
+          // عرض تفاصيل الخطأ القادم من السيرفر مباشرة لمعرفة السبب
+          const errDetail = data.error ? (data.error.message || data.error.status) : JSON.stringify(data);
+          loadingDiv.innerText = "خطأ من جوجل: " + errDetail;
         }
       } catch (error) {
-        loadingDiv.innerText = "حدث خطأ أثناء جلب الإجابة، يرجى التأكد من اتصال الإنترنت.";
+        loadingDiv.innerText = "خطأ اتصال: " + error.message;
       } finally {
         sendBtn.disabled = false;
         chatBox.scrollTop = chatBox.scrollHeight;
