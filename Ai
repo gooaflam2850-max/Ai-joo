@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gemini Chat</title>
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body { background-color: #f4f6f8; margin: 0; padding: 15px; display: flex; flex-direction: column; height: 100vh; }
+    #chat-box { flex: 1; overflow-y: auto; background: #ffffff; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 12px; }
+    .message { margin-bottom: 12px; padding: 10px 14px; border-radius: 10px; max-width: 80%; line-height: 1.5; word-break: break-word; }
+    .user { background: #007bff; color: white; align-self: flex-end; margin-right: auto; }
+    .bot { background: #e9ecef; color: #212529; align-self: flex-start; margin-left: auto; }
+    .input-area { display: flex; gap: 8px; }
+    input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; outline: none; font-size: 16px; }
+    button { padding: 12px 20px; background: #007bff; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    button:disabled { background: #aaa; }
+  </style>
+</head>
+<body>
+
+  <div id="chat-box"></div>
+
+  <div class="input-area">
+    <input type="text" id="user-input" placeholder="اكتب سؤالك هنا..." />
+    <button id="send-btn" onclick="sendMessage()">إرسال</button>
+  </div>
+
+  <script>
+    const API_KEY = "AIzaSyB8N6LYQ1ekDfEGwG3dLmWwfJ3DeS1o72cV_-E-iky_anR-A";
+    const URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+
+    async function sendMessage() {
+      const inputField = document.getElementById("user-input");
+      const sendBtn = document.getElementById("send-btn");
+      const chatBox = document.getElementById("chat-box");
+      const userText = inputField.value.trim();
+
+      if (!userText) return;
+
+      appendMessage(userText, "user");
+      inputField.value = "";
+      sendBtn.disabled = true;
+
+      const loadingDiv = appendMessage("جاري التحميل...", "bot");
+
+      try {
+        const response = await fetch(URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: userText }] }]
+          })
+        });
+
+        const data = await response.json();
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+          loadingDiv.innerText = data.candidates[0].content.parts[0].text;
+        } else {
+          loadingDiv.innerText = "تعذر الحصول على رد من النموذج.";
+        }
+      } catch (error) {
+        loadingDiv.innerText = "حدث خطأ أثناء جلب الإجابة، يرجى التأكد من اتصال الإنترنت.";
+      } finally {
+        sendBtn.disabled = false;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    }
+
+    function appendMessage(text, sender) {
+      const chatBox = document.getElementById("chat-box");
+      const msgDiv = document.createElement("div");
+      msgDiv.className = `message ${sender}`;
+      msgDiv.innerText = text;
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return msgDiv;
+    }
+
+    document.getElementById("user-input").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>
